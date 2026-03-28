@@ -1,0 +1,843 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: AI Money Mentor API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: gemini
+    description: Gemini AI chat and image operations
+  - name: finance
+    description: Financial planning and analysis operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /gemini/conversations:
+    get:
+      operationId: listGeminiConversations
+      tags: [gemini]
+      summary: List all conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GeminiConversation"
+    post:
+      operationId: createGeminiConversation
+      tags: [gemini]
+      summary: Create a new conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGeminiConversationBody"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeminiConversation"
+
+  /gemini/conversations/{id}:
+    get:
+      operationId: getGeminiConversation
+      tags: [gemini]
+      summary: Get conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeminiConversationWithMessages"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeminiError"
+    delete:
+      operationId: deleteGeminiConversation
+      tags: [gemini]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeminiError"
+
+  /gemini/conversations/{id}/messages:
+    get:
+      operationId: listGeminiMessages
+      tags: [gemini]
+      summary: List messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GeminiMessage"
+    post:
+      operationId: sendGeminiMessage
+      tags: [gemini]
+      summary: Send a message and receive an AI response (SSE stream)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendGeminiMessageBody"
+      responses:
+        "200":
+          description: SSE stream of assistant response chunks
+          content:
+            text/event-stream: {}
+
+  /gemini/generate-image:
+    post:
+      operationId: generateGeminiImage
+      tags: [gemini]
+      summary: Generate an image from a text prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateGeminiImageBody"
+      responses:
+        "200":
+          description: Generated image data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateGeminiImageResponse"
+
+  /finance/fire-plan:
+    post:
+      operationId: generateFirePlan
+      tags: [finance]
+      summary: Generate FIRE retirement plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FirePlanRequest"
+      responses:
+        "200":
+          description: FIRE plan generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FirePlanResponse"
+
+  /finance/health-score:
+    post:
+      operationId: calculateHealthScore
+      tags: [finance]
+      summary: Calculate money health score across 6 dimensions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HealthScoreRequest"
+      responses:
+        "200":
+          description: Health score calculated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthScoreResponse"
+
+  /finance/tax-wizard:
+    post:
+      operationId: analyzeTax
+      tags: [finance]
+      summary: Analyze tax and compare regimes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaxWizardRequest"
+      responses:
+        "200":
+          description: Tax analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaxWizardResponse"
+
+  /finance/life-event:
+    post:
+      operationId: analyzeLifeEvent
+      tags: [finance]
+      summary: Get AI advice for a life event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LifeEventRequest"
+      responses:
+        "200":
+          description: Life event advice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LifeEventResponse"
+
+  /finance/profiles:
+    get:
+      operationId: listFinancialProfiles
+      tags: [finance]
+      summary: List saved financial profiles
+      responses:
+        "200":
+          description: List of profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FinancialProfile"
+    post:
+      operationId: saveFinancialProfile
+      tags: [finance]
+      summary: Save a financial profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveFinancialProfileBody"
+      responses:
+        "201":
+          description: Saved profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinancialProfile"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    GeminiConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - createdAt
+
+    GeminiMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        conversationId:
+          type: integer
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    CreateGeminiConversationBody:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    SendGeminiMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    GeminiConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/GeminiMessage"
+      required:
+        - id
+        - title
+        - createdAt
+        - messages
+
+    GenerateGeminiImageBody:
+      type: object
+      properties:
+        prompt:
+          type: string
+      required:
+        - prompt
+
+    GenerateGeminiImageResponse:
+      type: object
+      properties:
+        b64_json:
+          type: string
+        mimeType:
+          type: string
+      required:
+        - b64_json
+        - mimeType
+
+    GeminiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    FirePlanRequest:
+      type: object
+      properties:
+        age:
+          type: integer
+        retirementAge:
+          type: integer
+        monthlyIncome:
+          type: number
+        monthlyExpenses:
+          type: number
+        existingInvestments:
+          type: number
+        existingEPF:
+          type: number
+        riskProfile:
+          type: string
+          enum: [conservative, moderate, aggressive]
+        lifeGoals:
+          type: array
+          items:
+            type: string
+      required:
+        - age
+        - retirementAge
+        - monthlyIncome
+        - monthlyExpenses
+        - existingInvestments
+        - riskProfile
+
+    FirePlanResponse:
+      type: object
+      properties:
+        targetCorpus:
+          type: number
+        monthlyInvestmentRequired:
+          type: number
+        sipAllocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SIPAllocation"
+        assetAllocation:
+          $ref: "#/components/schemas/AssetAllocation"
+        insuranceGaps:
+          type: array
+          items:
+            type: string
+        taxSavingSuggestions:
+          type: array
+          items:
+            type: string
+        emergencyFundTarget:
+          type: number
+        projections:
+          type: array
+          items:
+            $ref: "#/components/schemas/YearProjection"
+        aiInsights:
+          type: string
+      required:
+        - targetCorpus
+        - monthlyInvestmentRequired
+        - sipAllocations
+        - assetAllocation
+        - insuranceGaps
+        - taxSavingSuggestions
+        - emergencyFundTarget
+        - projections
+        - aiInsights
+
+    SIPAllocation:
+      type: object
+      properties:
+        goal:
+          type: string
+        amount:
+          type: number
+        fundType:
+          type: string
+        expectedReturn:
+          type: number
+      required:
+        - goal
+        - amount
+        - fundType
+        - expectedReturn
+
+    AssetAllocation:
+      type: object
+      properties:
+        equity:
+          type: number
+        debt:
+          type: number
+        gold:
+          type: number
+        realEstate:
+          type: number
+      required:
+        - equity
+        - debt
+        - gold
+        - realEstate
+
+    YearProjection:
+      type: object
+      properties:
+        year:
+          type: integer
+        age:
+          type: integer
+        portfolioValue:
+          type: number
+        monthlyContribution:
+          type: number
+      required:
+        - year
+        - age
+        - portfolioValue
+        - monthlyContribution
+
+    HealthScoreRequest:
+      type: object
+      properties:
+        monthlyIncome:
+          type: number
+        monthlyExpenses:
+          type: number
+        emergencyFundMonths:
+          type: number
+        lifeInsuranceCover:
+          type: number
+        healthInsuranceCover:
+          type: number
+        investmentTypes:
+          type: array
+          items:
+            type: string
+        monthlyEMI:
+          type: number
+        totalDebt:
+          type: number
+        taxFiledOnTime:
+          type: boolean
+        hasWill:
+          type: boolean
+        retirementSavingsMonthly:
+          type: number
+        age:
+          type: integer
+      required:
+        - monthlyIncome
+        - monthlyExpenses
+        - emergencyFundMonths
+        - lifeInsuranceCover
+        - healthInsuranceCover
+        - investmentTypes
+        - monthlyEMI
+        - totalDebt
+        - taxFiledOnTime
+        - hasWill
+        - retirementSavingsMonthly
+        - age
+
+    HealthScoreResponse:
+      type: object
+      properties:
+        overallScore:
+          type: number
+        grade:
+          type: string
+        dimensions:
+          $ref: "#/components/schemas/HealthDimensions"
+        recommendations:
+          type: array
+          items:
+            type: string
+        aiInsights:
+          type: string
+      required:
+        - overallScore
+        - grade
+        - dimensions
+        - recommendations
+        - aiInsights
+
+    HealthDimensions:
+      type: object
+      properties:
+        emergencyPreparedness:
+          type: number
+        insuranceCoverage:
+          type: number
+        investmentDiversification:
+          type: number
+        debtHealth:
+          type: number
+        taxEfficiency:
+          type: number
+        retirementReadiness:
+          type: number
+      required:
+        - emergencyPreparedness
+        - insuranceCoverage
+        - investmentDiversification
+        - debtHealth
+        - taxEfficiency
+        - retirementReadiness
+
+    TaxWizardRequest:
+      type: object
+      properties:
+        annualIncome:
+          type: number
+        basicSalary:
+          type: number
+        hraReceived:
+          type: number
+        rentPaid:
+          type: number
+        cityType:
+          type: string
+          enum: [metro, non-metro]
+        section80C:
+          type: number
+        section80D:
+          type: number
+        section80CCD:
+          type: number
+        homeLoanInterest:
+          type: number
+        otherDeductions:
+          type: number
+        age:
+          type: integer
+      required:
+        - annualIncome
+        - basicSalary
+        - age
+
+    TaxWizardResponse:
+      type: object
+      properties:
+        oldRegimeTax:
+          type: number
+        newRegimeTax:
+          type: number
+        recommendedRegime:
+          type: string
+        savings:
+          type: number
+        oldRegimeDeductions:
+          type: number
+        missingDeductions:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxDeduction"
+        taxSavingOptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxSavingOption"
+        aiInsights:
+          type: string
+      required:
+        - oldRegimeTax
+        - newRegimeTax
+        - recommendedRegime
+        - savings
+        - oldRegimeDeductions
+        - missingDeductions
+        - taxSavingOptions
+        - aiInsights
+
+    TaxDeduction:
+      type: object
+      properties:
+        section:
+          type: string
+        description:
+          type: string
+        maxLimit:
+          type: number
+        currentUsed:
+          type: number
+        potentialSaving:
+          type: number
+      required:
+        - section
+        - description
+        - maxLimit
+        - currentUsed
+        - potentialSaving
+
+    TaxSavingOption:
+      type: object
+      properties:
+        name:
+          type: string
+        section:
+          type: string
+        maxDeduction:
+          type: number
+        riskLevel:
+          type: string
+        liquidity:
+          type: string
+        description:
+          type: string
+      required:
+        - name
+        - section
+        - maxDeduction
+        - riskLevel
+        - liquidity
+        - description
+
+    LifeEventRequest:
+      type: object
+      properties:
+        event:
+          type: string
+          enum: [bonus, inheritance, marriage, new_baby, job_loss, retirement, property_purchase]
+        amount:
+          type: number
+        monthlyIncome:
+          type: number
+        monthlyExpenses:
+          type: number
+        existingInvestments:
+          type: number
+        taxBracket:
+          type: number
+        riskProfile:
+          type: string
+          enum: [conservative, moderate, aggressive]
+        age:
+          type: integer
+        additionalContext:
+          type: string
+      required:
+        - event
+        - monthlyIncome
+        - monthlyExpenses
+        - existingInvestments
+        - riskProfile
+        - age
+
+    LifeEventResponse:
+      type: object
+      properties:
+        eventSummary:
+          type: string
+        immediateActions:
+          type: array
+          items:
+            type: string
+        investmentStrategy:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvestmentSuggestion"
+        taxImplications:
+          type: string
+        insuranceReview:
+          type: string
+        timeline:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionTimeline"
+        aiInsights:
+          type: string
+      required:
+        - eventSummary
+        - immediateActions
+        - investmentStrategy
+        - taxImplications
+        - insuranceReview
+        - timeline
+        - aiInsights
+
+    InvestmentSuggestion:
+      type: object
+      properties:
+        instrument:
+          type: string
+        allocation:
+          type: number
+        rationale:
+          type: string
+        amount:
+          type: number
+      required:
+        - instrument
+        - allocation
+        - rationale
+        - amount
+
+    ActionTimeline:
+      type: object
+      properties:
+        timeframe:
+          type: string
+        actions:
+          type: array
+          items:
+            type: string
+      required:
+        - timeframe
+        - actions
+
+    FinancialProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        age:
+          type: integer
+        monthlyIncome:
+          type: number
+        monthlyExpenses:
+          type: number
+        riskProfile:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - age
+        - monthlyIncome
+        - monthlyExpenses
+        - riskProfile
+        - createdAt
+        - updatedAt
+
+    SaveFinancialProfileBody:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+        monthlyIncome:
+          type: number
+        monthlyExpenses:
+          type: number
+        riskProfile:
+          type: string
+      required:
+        - name
+        - age
+        - monthlyIncome
+        - monthlyExpenses
+        - riskProfile

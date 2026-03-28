@@ -1,0 +1,153 @@
+Enhance the existing "AI Money Mentor" project by adding three new features. Do NOT rebuild the app. Only extend existing structure.
+
+---
+
+📊 1. FINANCIAL INSIGHTS DASHBOARD
+
+Route:
+
+"/insights"
+
+Add to sidebar:
+
+"Insights"
+
+Inputs:
+
+- Monthly income
+- Expenses (food, rent, travel, others)
+
+Logic:
+
+- Calculate:
+  - Total expenses
+  - Savings = income - expenses
+
+Output:
+
+- Show:
+  - Total expenses
+  - Savings
+- Charts:
+  - Pie chart → expense distribution
+  - Bar chart → spending overview
+
+Insights:
+
+- If expenses > 70% income → show "You are overspending"
+- If savings > 30% → show "Good financial discipline"
+- Show 2–3 smart suggestions
+
+---
+
+👩‍❤️‍👨 2. COUPLE FINANCE PLANNER
+
+Route:
+
+"/couple-planner"
+
+Add to sidebar:
+
+"Couple Planner"
+
+Inputs:
+
+Partner 1:
+
+- Income
+- Expenses
+
+Partner 2:
+
+- Income
+- Expenses
+
+Logic:
+
+- Calculate:
+  - Combined income
+  - Combined expenses
+  - Total savings
+
+Output:
+
+- Show:
+  - Monthly savings
+  - Suggested allocation:
+    - 50% needs
+    - 30% investments
+    - 20% savings
+
+Suggestions:
+
+- If one partner earns more → suggest proportional contribution
+- Suggest joint emergency fund
+
+---
+
+📈 3. MUTUAL FUND PORTFOLIO X-RAY
+
+Route:
+
+"/mf-xray"
+
+Add to sidebar:
+
+"MF X-Ray"
+
+Inputs:
+
+- Total investment amount
+- Risk level (Low / Medium / High)
+
+Logic:
+
+- Low → more debt allocation
+- Medium → balanced
+- High → equity-heavy
+
+Output:
+
+- Show:
+  - Equity %
+  - Debt %
+  - Liquid %
+- Show estimated return range
+
+Insights:
+
+- Suggest diversification
+- Warn if too risky or too conservative
+
+---
+
+🎨 UI REQUIREMENTS
+
+- Use clean dashboard cards
+- Maintain consistent spacing (p-4, p-6, gap-6)
+- Ensure responsive design
+- Avoid overflow and overlapping
+- Keep dark theme with high contrast text
+
+---
+
+⚙️ TECHNICAL
+
+- Use React with useState
+- Store temporary data in local state or localStorage
+- No API required (use mock logic)
+- Follow existing project structure
+
+---
+
+🚫 IMPORTANT
+
+- Do NOT modify existing features
+- Do NOT break routing
+- Only add new pages and components
+
+---
+
+🎯 GOAL
+
+Make the app feel like a complete financial platform with analytics, couple planning, and portfolio insights.
