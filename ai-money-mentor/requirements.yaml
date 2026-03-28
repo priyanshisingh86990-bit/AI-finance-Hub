@@ -1,0 +1,20 @@
+packages:
+  "recharts": "For rendering beautiful financial charts (FIRE projections, asset allocation, health score)"
+  "framer-motion": "For smooth page transitions and micro-interactions"
+  "lucide-react": "For beautiful crisp icons across the application"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility function to efficiently merge Tailwind CSS classes"
+  "date-fns": "For formatting dates in the chat interface"
+
+images:
+  - path: "artifacts/ai-money-mentor/public/images/hero-mesh.png"
+    description: "Abstract premium 3D mesh background in deep navy blue, teal, and emerald green with soft studio lighting, representing wealth and fintech, clean and minimal"
+    aspect_ratio: "16:9"
+  - path: "artifacts/ai-money-mentor/public/images/logo-icon.png"
+    description: "Minimalist geometric fintech logo mark combining a spark or upward arrow with a coin or shield shape, deep emerald green on transparent background"
+    aspect_ratio: "1:1"
+
+notes:
+  - Using Indian Rupee (₹) and Indian number formatting (lakhs/crores) throughout.
+  - Chat streaming uses native fetch and ReadableStream parsing as Orval cannot handle SSE hooks.
+  - Assuming standard Replit generated Shadcn UI components are available, but falling back to styled native elements where complex generic components might be risky.
